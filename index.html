@@ -37,7 +37,8 @@
     background: var(--bg-deep);
     color: var(--text-primary);
     display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-columns: var(--sidebar-w) 1fr var(--right-w, 0px);
+    transition: grid-template-columns 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     grid-template-rows: 1fr var(--now-h);
     height: 100vh;
     user-select: none;
@@ -481,7 +482,7 @@
 
   /* ─── NOW PLAYING BAR ─── */
   .now-bar {
-    grid-column: 2;
+    grid-column: 2 / -1;
     background: rgba(14,14,20,0.95);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
@@ -675,6 +676,115 @@
   }
 
   .volume-wrap:hover .volume-slider::-webkit-slider-thumb { opacity: 1; }
+
+  
+  /* ─── RIGHT SIDEBAR ─── */
+  .right-sidebar {
+    grid-column: 3;
+    grid-row: 1 / 2;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: var(--right-w, 0px);
+    opacity: 0;
+    transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  }
+  
+  body.show-right {
+    --right-w: 320px;
+  }
+  
+  body.show-right .right-sidebar {
+    opacity: 1;
+  }
+  
+  .right-sidebar::-webkit-scrollbar { width: 0; }
+  
+  .rs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 20px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+  
+  .rs-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .rs-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+  
+  .rs-content {
+    padding: 0 20px 24px;
+    min-width: 320px; /* Prevent squishing during animation */
+  }
+  
+  .rs-art {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .rs-art img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .rs-title-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  
+  .rs-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  
+  .rs-artist {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  
+  .rs-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .rs-panel-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+  }
+  
+  .rs-panel-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .rs-panel-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .rs-panel-row strong { color: var(--text-primary); font-weight: 500; }
 
   /* ─── Visualizer ─── */
   .visualizer-wrap {
@@ -1094,11 +1204,41 @@
     </div>
   </div></main>
 
+
+  <!-- ─── RIGHT SIDEBAR ─── -->
+  <div class="right-sidebar" id="rightSidebar">
+    <div class="rs-header">
+      <div>Now Playing</div>
+      <div class="rs-close" onclick="toggleRightSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+    </div>
+    <div class="rs-content">
+      <div class="rs-art"><img src="" id="rsImg" alt="Album Art"></div>
+      <div class="rs-title-wrap">
+        <div>
+          <div class="rs-title" id="rsTitle">Select a track</div>
+          <div class="rs-artist" id="rsArtist">—</div>
+        </div>
+        <div class="bar-like" id="rsLikeBtn" style="width:36px;height:36px;background:var(--bg-card);border:1px solid var(--border);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        </div>
+      </div>
+      
+      <div class="rs-panel">
+        <div class="rs-panel-title">About this track</div>
+        <div class="rs-panel-row"><span>Album</span><strong id="rsAlbum">—</strong></div>
+        <div class="rs-panel-row"><span>Year</span><strong id="rsYear">—</strong></div>
+        <div class="rs-panel-row"><span>Genre</span><strong id="rsGenre">—</strong></div>
+      </div>
+    </div>
+  </div>
+
 <!-- ─── NOW PLAYING BAR ─── -->
 <div class="now-bar">
   <!-- Track Info -->
   <div class="bar-track">
-    <div class="bar-thumb" id="barThumb">
+    <div class="bar-thumb" id="barThumb" onclick="toggleRightSidebar()" style="cursor:pointer;" title="Toggle Now Playing View">
       <span id="barThumbEmoji"></span>
       <img id="barThumbImg" style="display:none" alt="">
     </div>
@@ -1271,6 +1411,11 @@ function updateHero(idx) {
   updateLikeButtons(idx);
 }
 
+
+function toggleRightSidebar() {
+  document.body.classList.toggle('show-right');
+}
+
 function updateBar(idx) {
   const t = tracks[idx];
   document.getElementById('barThumbEmoji').textContent = t.emoji;
@@ -1283,6 +1428,14 @@ function updateBar(idx) {
       document.getElementById('barThumbEmoji').style.display = 'block';
    }
   document.getElementById('barTitle').textContent = t.title;
+
+  document.getElementById('rsImg').src = t.img;
+  document.getElementById('rsTitle').textContent = t.title;
+  document.getElementById('rsArtist').textContent = t.artist;
+  document.getElementById('rsAlbum').textContent = t.album;
+  document.getElementById('rsYear').textContent = t.year;
+  document.getElementById('rsGenre').textContent = t.genre;
+
   document.getElementById('barArtist').textContent = t.artist;
   document.getElementById('totalTime').textContent = t.dur;
   simProgress = 0;
