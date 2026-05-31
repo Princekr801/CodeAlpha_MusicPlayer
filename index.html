@@ -1481,7 +1481,11 @@ function buildViz() {
   }).join('');
 }
 
-function playTrack(idx) {\n  currentTrack = idx;\n  isPlaying = true;\n  audio.src = tracks[idx].audioUrl;\n  audio.play();
+function playTrack(idx) {
+  currentTrack = idx;
+  isPlaying = true;
+  audio.src = tracks[idx].audioUrl;
+  audio.play();
   updateHero(idx);
   updateBar(idx);
   updatePlaylist();
@@ -1492,7 +1496,18 @@ function playTrack(idx) {\n  currentTrack = idx;\n  isPlaying = true;\n  audio.s
   buildViz();
 }
 
-function togglePlay() {\n  if (isPlaying) {\n    isPlaying = false;\n    audio.pause();\n  } else {\n    isPlaying = true;\n    audio.play();\n  }\n  updatePlayPauseIcon();\n  updatePlaylist();\n  buildViz();\n}
+function togglePlay() {
+  if (isPlaying) {
+    isPlaying = false;
+    audio.pause();
+  } else {
+    isPlaying = true;
+    audio.play();
+  }
+  updatePlayPauseIcon();
+  updatePlaylist();
+  buildViz();
+}
 
 function updatePlayPauseIcon() {
   const icon = document.getElementById('playIcon');
@@ -1569,12 +1584,38 @@ function toggleLike() {
 document.getElementById('heroLikeBtn').addEventListener('click', toggleLike);
 document.getElementById('barLikeBtn').addEventListener('click', toggleLike);
 
-function setVolume(val) {\n  const v = document.getElementById('volumeSlider');\n  v.style.setProperty('--vol-pct', val + '%');\n  v.value = val;\n  audio.volume = val / 100;\n  isMuted = val == 0;\n  updateVolIcon();\n} else {
+function setVolume(val) {
+  const v = document.getElementById('volumeSlider');
+  v.style.setProperty('--vol-pct', val + '%');
+  v.value = val;
+  audio.volume = val / 100;
+  isMuted = val == 0;
+  updateVolIcon();
+}
+
+function updateVolIcon() {
+  const icon = document.getElementById('volumeIcon');
+  if (isMuted || document.getElementById('volumeSlider').value == 0) {
+    icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+  } else {
     icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
   }
 }
 
-function toggleMute() {\n  const v = document.getElementById('volumeSlider');\n  if(isMuted) {\n    isMuted = false;\n    v.value = 70;\n    audio.volume = 0.7;\n    setVolume(70);\n  } else {\n    isMuted = true;\n    v.value = 0;\n    audio.volume = 0;\n    setVolume(0);\n  }\n}
+function toggleMute() {
+  const v = document.getElementById('volumeSlider');
+  if(isMuted) {
+    isMuted = false;
+    v.value = 70;
+    audio.volume = 0.7;
+    setVolume(70);
+  } else {
+    isMuted = true;
+    v.value = 0;
+    audio.volume = 0;
+    setVolume(0);
+  }
+}
 
 document.getElementById('addToQueueBtn').addEventListener('click', function() {
   this.textContent = '✓ Added!';
