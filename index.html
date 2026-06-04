@@ -975,6 +975,92 @@
   }
   .banner-btn.secondary:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 
+  /* --- MOBILE RESPONSIVENESS --- */
+  .mobile-header {
+    display: none;
+    position: sticky;
+    top: 0;
+    height: 60px;
+    background: rgba(14,14,20,0.95);
+    backdrop-filter: blur(20px);
+    z-index: 500;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mobile-header-logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-left: 12px;
+  }
+  .mobile-header-logo span { color: var(--accent); }
+  .hamburger-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .mobile-header { display: flex; }
+    .top-banner { height: 250px; padding: 20px; margin-bottom: 16px; }
+    .banner-title { font-size: 36px; }
+    
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: var(--now-h);
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      backdrop-filter: blur(4px);
+    }
+    body.mobile-sidebar-open .sidebar-overlay { display: block; }
+    
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 280px;
+      height: calc(100vh - var(--now-h));
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    }
+    body.mobile-sidebar-open .sidebar { left: 0; }
+    
+    .right-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: calc(100vh - var(--now-h));
+      z-index: 900;
+      border-left: none;
+    }
+    body.show-right { --right-w: 100vw; }
+    
+    .hero-top { flex-direction: column; align-items: center; text-align: center; }
+    .album-art-main { width: 180px; height: 180px; }
+    .hero-actions { justify-content: center; flex-wrap: wrap; }
+    .hero-section { padding: 20px 20px 16px; }
+    .content-section { padding: 0 20px 20px; }
+    
+    .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .featured-strip { grid-template-columns: 1fr; }
+    #albumSections { grid-template-columns: 1fr; }
+    
+    /* Now Playing Bar */
+    .now-bar {
+      grid-template-columns: 1fr auto;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .bar-extras, .progress-row, .bar-like { display: none !important; }
+    .ctrl-row { gap: 16px; }
+    .ctrl-btn[title="Shuffle"], .ctrl-btn[title="Repeat"], .ctrl-btn[title="Previous"] { display: none !important; }
+    .bar-thumb { width: 44px; height: 44px; }
+  }
 </style>
 </head>
 <body>
@@ -1017,8 +1103,18 @@
   <div class="playlist-section" id="playlistSidebar"></div>
 </aside>
 
+<div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
 <!-- ─── MAIN ─── -->
 <main class="main" id="main">
+
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <div class="hamburger-btn" onclick="toggleMobileSidebar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </div>
+    <div class="mobile-header-logo">Su<span>no</span></div>
+  </div>
 
   <!-- Animated Top Banner -->
   <div class="top-banner" id="topBanner">
@@ -1414,6 +1510,10 @@ function updateHero(idx) {
 
 function toggleRightSidebar() {
   document.body.classList.toggle('show-right');
+}
+
+function toggleMobileSidebar() {
+  document.body.classList.toggle('mobile-sidebar-open');
 }
 
 function updateBar(idx) {
