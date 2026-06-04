@@ -1396,7 +1396,7 @@
   </div>
 </div>
 
-<div id="yt-wrapper" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
+<div id="yt-wrapper" style="position: fixed; top: -9999px; left: -9999px; width: 300px; height: 300px; opacity: 0; pointer-events: none; overflow: hidden; z-index: -9999;">
   <div id="yt-player"></div>
 </div>
 
@@ -1482,23 +1482,31 @@ let isYoutubeReady = false;
 
 function onYouTubeIframeAPIReady() {
   player = new YT.Player('yt-player', {
-    height: '10',
-    width: '10',
+    height: '200',
+    width: '200',
     videoId: tracks[0].youtubeId,
     playerVars: {
       'playsinline': 1,
       'controls': 0,
-      'disablekb': 1
+      'disablekb': 1,
+      'origin': window.location.origin
     },
     events: {
       'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
+      'onStateChange': onPlayerStateChange,
+      'onError': onPlayerError
     }
   });
 }
 
 function onPlayerReady(event) {
   isYoutubeReady = true;
+}
+
+function onPlayerError(event) {
+  console.log("YouTube error code:", event.data);
+  // Auto-skip to the next track if a video is blocked from embedding (e.g. by T-Series)
+  setTimeout(nextTrack, 500);
 }
 
 function onPlayerStateChange(event) {
